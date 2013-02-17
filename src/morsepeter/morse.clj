@@ -98,4 +98,4 @@
                          (str "0" group)
                          group)
                        " "
-                        text)))
+                       text)))

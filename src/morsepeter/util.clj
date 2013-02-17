@@ -46,7 +46,7 @@
 
 (defn interleave-seqs
   "takes several seqs and returns an infinite lazy seq that contains everything from the given seqs;
-   the input seqs are consumed in the background (on thread per seq)"
+   the input seqs are consumed in the background (one thread per seq)"
   [& seqs]
   (let [[queue put] (make-queue)]
     (doseq [s seqs]
