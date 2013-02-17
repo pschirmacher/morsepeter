@@ -45,13 +45,11 @@
 
 (defn highs-or-lows
   "takes a signal and converts it to a seq of 0s or 1s for each 'tic', e.g.
-   [true 300] -> (1 1 1) when the tic length is 100 milliseconds"
-  ([signal]
-     (highs-or-lows signal 100))
-  ([[high millis] tic-millis]
-     (let [tics (Math/round (/ millis (double tic-millis)))
-           high-or-low (if high 1 0)]
-       (repeat tics high-or-low))))
+   [true 300] -> (1 1 1) when tic-millis is 100 milliseconds"
+  [tic-millis [high millis]]
+  (let [tics (Math/round (/ millis (double tic-millis)))
+        high-or-low (if high 1 0)]
+    (repeat tics high-or-low)))
 
 (defn drop-before
   "drops everything from the coll before the given prefix, e.g.:
@@ -85,31 +83,25 @@
            :else
            ()))))
 
-(def msg-start-pattern [1 1 1 0 1 0 1 1 1 0 1 0 1 1 1])
-
-(def msg-end-pattern [1 0 1 1 1 0 1 0 1 1 1 0 1])
-
 (defn extract-message-body
   "takes a collection of bits that starts with start-pattern and ends with end-pattern and returns the body as a bit-string, e.g.:
-   (extract-message-body [<start-pattern> 1 0 1 0 0 1 <end-pattern>]) -> \"101001\""
-  ([bits]
-     (extract-message-body bits msg-start-pattern msg-end-pattern))
-  ([bits start-pattern end-pattern]
-     (->> bits
-          (drop (count start-pattern))
-          reverse
-          (drop (count end-pattern))
-          reverse
-          (apply str))))
+   (extract-message-body [<start-pattern> 1 0 1 0 0 1 <end-pattern>] <start-pattern> <end-pattern>) -> \"101001\""
+  [start-pattern end-pattern bits]
+  (->> bits
+       (drop (count start-pattern))
+       reverse
+       (drop (count end-pattern))
+       reverse
+       (apply str)))
 
 (defn signals->messages
   "returns messages as bit strings, e.g.:
    (\"111000111\" \"1010101\"...)"
-  [signals]
-  (->> signals                                         ;; ([false 3452] [true 703] [false 300]...)
+  [tic-millis start-pattern end-pattern signals]
+  (->> signals                                                          ;; ([false 400] [true 300] [false 300]...)
        (u/trace-seq "signal")
-       (map highs-or-lows)                             ;; ((0 0 0 0) (1 1 1) (0 0 0)...)
-       u/lazy-flatten                                    ;; (0 0 0 0 1 1 1 0 0 0...) mapcat is not lazy enough
-       (find-chunks msg-start-pattern msg-end-pattern) ;; ((<bits of first message>) (<bits of second message>)...)
+       (map (partial highs-or-lows tic-millis))                         ;; ((0 0 0 0) (1 1 1) (0 0 0)...)
+       u/lazy-flatten                                                   ;; (0 0 0 0 1 1 1 0 0 0...) mapcat is not lazy enough
+       (find-chunks start-pattern end-pattern)                          ;; ((<bits of first message>) (<bits of second message>)...)
        (u/trace-seq "bit message")
-       (map extract-message-body)))                    ;; ("111000101" "1010111" ...)
+       (map (partial extract-message-body start-pattern end-pattern)))) ;; ("111000101" "1010111" ...)

@@ -77,7 +77,7 @@
 
 (defn encode-word [word]
   (let [codes (map (fn [sign]
-                     (get sign->code sign ""))
+                     (get sign->code (str sign) ""))
                    word)]
     (s/join (str between-signs) codes)))
 
@@ -88,10 +88,10 @@
 
 (defn serialize-message
   "takes a message and returns a string of bits, e.g.:
-   (serialize [5 \"a\"])"
+   (serialize-message [5 \"A\"]) -> \"1110111011101110111000101010101000000000000010111\""
   [[group text]]
   (encode-message (str (if (< group 10)
                          (str "0" group)
                          group)
                        " "
-                       (.toUpperCase text))))
+                        text)))
