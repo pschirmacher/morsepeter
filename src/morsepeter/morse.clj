@@ -48,6 +48,8 @@
 
 (def between-words #"0000000")
 
+                                        ; DECODING
+
 (defn decode-sign [bit-string]
   (if-let [sign (code->sign bit-string)]
     sign
@@ -74,6 +76,8 @@
   [msg]
   (let [[first-word & more] (s/split msg #" ")]
     [(Integer/valueOf first-word) (s/join " " more)]))
+
+                                        ; ENCODING
 
 (defn encode-word [word]
   (let [codes (map (fn [sign]

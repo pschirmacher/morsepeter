@@ -34,21 +34,21 @@
                            (s/message->signals dit-millis msg-start-pattern msg-end-pattern)
                            s/send-signals!)))))
 
-(defn get-keyboard-messages
-  "infinite lazy seq of keyboard messages that should be sent and a function that takes a message which is then added to that seq"
+(defn keyboard-messaging
+  "creates infinite lazy seq of keyboard messages that should be sent and a function that takes a message which is then added to that seq"
   []
   (let [[queue put] (u/make-queue)
         send-msg (fn [text]
                    (->> [my-group (.toUpperCase text)]
-                        m/serialize-message
                         (u/trace "keyboard input")
                         put))]
     [queue send-msg]))
 
 (defn run! []
-  (let [[keyboard-messages send-message] (get-keyboard-messages)
-        all-messages keyboard-messages]
-    (send-messages! all-messages)
+  (let [[keyboard-messages send-message] (keyboard-messaging)
+        wire-messages (get-wire-messages!)                                ;; starts a thread that polls input pin
+        all-messages (u/interleave-seqs keyboard-messages wire-messages)] ;; starts two threads that wait for messages from input pin and keyboard
+    (send-messages! all-messages)                                         ;; starts a thread that sends the messages
     send-message))
 
-;; (def sender (run!))
+;; (def send (run!))

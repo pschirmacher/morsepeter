@@ -8,6 +8,7 @@
   ([signals]
      (send-signals! signals 1))
   ([signals pin-number]
+     (println "sending signals" signals)
      (with-open [out (OutPin. pin-number)]
        (.setValue out false)
        (doseq [[on-or-off millis] signals]
