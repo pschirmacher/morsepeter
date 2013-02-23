@@ -20,9 +20,8 @@
   []
   (->> (r/receive-signals!) ;; this starts a thread in the background that does the polling
        (partial r/signals->messages dit-millis msg-start-pattern msg-end-pattern)
-       (map m/decode-message)
-       (u/trace-seq "decoded message")
-       (map m/parse-message)
+       (map m/deserialize-message)
+       (u/trace-seq "deserialized message")
        (remove invalid-group?)))
 
 (defn send-messages!

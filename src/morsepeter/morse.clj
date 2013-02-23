@@ -62,20 +62,23 @@
        (map decode-sign)
        s/join))
 
-(defn decode-message
-  "decodes a message, e.g.:
-   (decode-message \"1110111011101110111000101010101000000010111\") -> \"05 A\""
+(defn decode-text
+  "decodes a bit-string, e.g.:
+   (decode-text \"1110111011101110111000101010101000000010111\") -> \"05 A\""
   [bit-string]
   (let [words (map decode-word
                    (s/split bit-string between-words))]
-    (s/join " " (rest words))))
+    (s/join " " words)))
 
 (defn parse-message
-  "parses a message, e.g.:
+  "parse the message into a vector, e.g.:
    (parse-message \"05 A\") -> [5 \"A\"]"
   [msg]
   (let [[first-word & more] (s/split msg #" ")]
     [(Integer/valueOf first-word) (s/join " " more)]))
+
+(defn deserialize-message [bit-string]
+  (parse-message (decode-text bit-string)))
 
                                         ; ENCODING
 
@@ -85,16 +88,16 @@
                    word)]
     (s/join (str between-signs) codes)))
 
-(defn encode-message [msg]
-  (let [words (s/split msg between-words)
+(defn encode-text [text]
+  (let [words (s/split text #" ")
         word-codes (map encode-word words)]
     (s/join (str between-words) word-codes)))
 
 (defn serialize-message
   "takes a message and returns a string of bits, e.g.:
-   (serialize-message [5 \"A\"]) -> \"1110111011101110111000101010101000000000000010111\""
+   (serialize-message [5 \"A\"]) -> \"1110111011101110111000101010101000000010111\""
   [[group text]]
-  (encode-message (str (if (< group 10)
+  (encode-text (str (if (< group 10)
                          (str "0" group)
                          group)
                        " "
