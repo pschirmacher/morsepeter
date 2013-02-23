@@ -1,13 +1,13 @@
 # morsepeter
 
-A Clojure library designed to ... well, that part is up to you.
+Unpolished morse telegraph written in Clojure for the Raspberry Pi. Largely unfinished and not tested.
 
 ## Usage
 
-FIXME
+Depends on https://github.com/jkransen/framboos which needs to be 'mvn install'ed locally.
 
 ## License
 
-Copyright © 2013 FIXME
+Copyright © 2013 pschirmacher
 
 Distributed under the Eclipse Public License, the same as Clojure.
