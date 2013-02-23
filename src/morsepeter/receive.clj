@@ -33,7 +33,8 @@
                  (callback [last-on duration])
                  (Thread/sleep timeout)
                  (recur now-on now-time))))))
-       (println "stopped polling"))))
+       (println "stopped polling"))
+     (println "closed input pin")))
 
 (defn receive-signals!
   "starts polling and creates an infinite lazy seq of the received signals, e.g.:

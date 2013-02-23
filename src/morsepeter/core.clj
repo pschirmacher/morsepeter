@@ -35,14 +35,15 @@
                            s/send-signals!)))))
 
 (defn keyboard-messaging
-  "creates infinite lazy seq of keyboard messages that should be sent and a function that takes a message which is then added to that seq"
+  "creates an OAinfinite lazy seq of keyboard messages that should be sent and
+   a function that takes a message which is then added to that seq"
   []
   (let [[queue put] (u/make-queue)
-        send-msg (fn [text]
-                   (->> [my-group (.toUpperCase text)]
-                        (u/trace "keyboard input")
-                        put))]
-    [queue send-msg]))
+        make-message #(vector my-group (.toUpperCase %))
+        messages (->> queue
+                      (map make-message)
+                      (u/trace "keyboard input"))]
+    [messages put]))
 
 (defn run! []
   (let [[keyboard-messages send-message] (keyboard-messaging)

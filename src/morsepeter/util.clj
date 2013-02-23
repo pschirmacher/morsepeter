@@ -45,7 +45,7 @@
      (map (partial trace msg) coll)))
 
 (defn interleave-seqs
-  "takes several seqs and returns an infinite lazy seq that contains everything from the given seqs;
+  "takes several seqs and returns a lazy seq that contains everything from the given seqs;
    the input seqs are consumed in the background (one thread per seq)"
   [& seqs]
   (let [[queue put] (make-queue)]
